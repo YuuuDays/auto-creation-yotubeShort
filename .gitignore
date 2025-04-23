@@ -8,4 +8,7 @@ token.json
 .env
 .MEMO/
 .idea/
-fillter.py
+# filter.py は無視する
+content_processing/filter.py
+
+!content_processing/extract_images_and_texts.py
