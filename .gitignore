@@ -8,6 +8,4 @@ token.json
 .env
 .MEMO/
 .idea/
-!content_processing/extract_text_and_image.py
-
 /content_processing/fillter.py
