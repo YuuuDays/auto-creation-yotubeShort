@@ -1,3 +1,5 @@
+import re
+
 from bs4 import BeautifulSoup
 
 """
@@ -20,12 +22,19 @@ def extract_images_and_texts(html: str):
 
     # テキスト（bタグ内）をすべて取得
     text_dict = {}
+    tmp_list  =[]
     idx = 0
+
+    print("+*+*+**+*+*+*+*+*")
     for div in soup.find_all('div', id=lambda x: x and x.startswith('resid')):
         b_tag = div.find('b')
         #print(b_tag)
         if b_tag:
             text = b_tag.get_text(strip=True)
             if text:
-                print(text)
-                #test
+                # トリミング処理('>>数字'の部分の切り取り)
+                convert_text = re.sub(r'>>\d+[，,]?','>>',text)
+                print(convert_text)
+
+                #print(text)]
+
