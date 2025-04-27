@@ -18,10 +18,9 @@ def extract_images_and_texts(html: str):
     }
 
     print("---★---")
-    print(image_dict)
+    #print(image_dict)
 
     # テキスト（bタグ内）をすべて取得
-    text_dict = {}
     tmp_list  =[]
     idx = 0
 
@@ -34,7 +33,10 @@ def extract_images_and_texts(html: str):
             if text:
                 # トリミング処理('>>数字'の部分の切り取り)
                 convert_text = re.sub(r'>>\d+[，,]?','>>',text)
-                print(convert_text)
+                tmp_list.append(convert_text)
+                # print(convert_text)
 
-                #print(text)]
+    # 作成したリストをタプルinリストへ
+    text_dict = [(i,s) for i, s in enumerate(tmp_list)] # ← [(0,'xxx'),(1,'yyy'),...] タプルinリスト
 
+    return image_dict,text_dict
