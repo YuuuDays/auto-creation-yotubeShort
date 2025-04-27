@@ -1,5 +1,9 @@
 from pydub import AudioSegment
-import os
+import os,re
+
+def natural_sort_key(s):
+    # 数字を抽出して、リストに分けて返す
+    return [int(text) if text.isdigit() else text.lower() for text in re.split('([0-9]+)', s)]
 
 def combine_audio_with_silence(audio_folder, output_file, audio_format):
     # もし出力ファイル(final_output.mp3)が既に存在していたら削除
@@ -14,8 +18,9 @@ def combine_audio_with_silence(audio_folder, output_file, audio_format):
     timestamps = []
     current_time = 0
 
-    files = sorted(os.listdir(audio_folder))
+    files = sorted(os.listdir(audio_folder), key=natural_sort_key)
     for filename in files:
+        print(f"filename={filename}")
         if filename.endswith(audio_format) and filename != os.path.basename(output_file):
             file_path = os.path.join(audio_folder, filename)
             audio = AudioSegment.from_mp3(file_path)

@@ -54,7 +54,7 @@ def main():
     # voiceの作成
     generate_all_voices(text_dict)
 
-    # OUTPUTフォルダの中にある音声ファイルを一つの音声ファイルに結合
+    # output_audioフォルダの中にある音声ファイルを一つの音声ファイルに結合
     timestamps = combine_audio_with_silence("output_audio", "output_audio/final_output.mp3",audio_format)
 
 
