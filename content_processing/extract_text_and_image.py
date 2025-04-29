@@ -35,9 +35,13 @@ def extract_images_and_texts(html: str):
             if text:
                 # トリミング処理('>>数字'の部分の切り取り)
                 convert_text = re.sub(r'>>\d+[，,]?','>>',text)
+
                 # マスキング処理(fillter.pyの文言に対して伏字を行う)
-                convert_text_filtered= filter_mask_text(convert_text)
-                tmp_list.append(convert_text_filtered)
+                #convert_text_filtered= filter_mask_text(convert_text)
+                #tmp_list.append(convert_text_filtered)
+
+
+                tmp_list.append(convert_text)
                 # print(convert_text)
 
     # 作成したリストをタプルinリストへ

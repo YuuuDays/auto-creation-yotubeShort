@@ -3,6 +3,8 @@ import time
 import requests
 import os
 from dotenv import load_dotenv
+from faster_whisper import WhisperModel
+
 
 # 1. VOICEVOXエンジンを起動する
 def start_voicevox_engine():
@@ -55,3 +57,6 @@ def create_voice(text, speaker_id, output_path):
         f.write(synthesis.content)
 
     print(f"保存完了！: {output_path}")
+
+    # ピー音加工する
+    #apply_beep_filter(output_path, text)

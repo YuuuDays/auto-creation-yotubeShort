@@ -1,19 +1,27 @@
 # -*- coding: utf-8 -*-
 # インポート文
-from generation.audio_creation import generate_audio
+import os
+import threading
+from utils.logger import get_logger
+
+# 自作モジュール
 from generation.audio_creation_voicevox import start_voicevox_engine, generate_all_voices
-from generation.combine_audio_files import combine_audio_with_silence
 from scraping.fetch_threads import scraping_website
 from content_processing.fillter import filter_mask_text
-from utils.logger import get_logger
 from api.contact_openapi import convert_title_to_slang
 from content_processing.extract_text_and_image import extract_images_and_texts
+from generation.p_voice_filter import apply_beep_filter_from_text
+
 # グローバル定数
 audio_format = ".wav"
 
-# 関数の定義
+# ロガー
 logger = get_logger(__name__)
 
+
+# ================================
+# メイン処理
+# ================================
 def main():
     print("--処理開始--")
 
@@ -44,18 +52,25 @@ def main():
     for j in text_dict:
         print(j)
 
-    #generate_audio(text_dict)
-
-    """""""""""""""""""""""""""
-    VOICEの作成
-    """""""""""""""""""""""""""
+    # """""""""""""""""""""""""""
+    # VOICEの作成
+    # """""""""""""""""""""""""""
     # VICEVOXの初期化(起動)
     start_voicevox_engine()
     # voiceの作成
     generate_all_voices(text_dict)
 
+
+    # =================================
+    # ピー音加工
+    # =================================
+    # VOICE生成後のループで適用（セリフごと）
+    for key, line in text_dict:
+        wav_path = f"output_audio/voice_{key}.wav"
+        apply_beep_filter_from_text(wav_path, line)
+
     # output_audioフォルダの中にある音声ファイルを一つの音声ファイルに結合
-    timestamps = combine_audio_with_silence("output_audio", "output_audio/final_output.mp3",audio_format)
+    #timestamps = combine_audio_with_silence("output_audio", "output_audio/final_output.mp3",audio_format)
 
 
 # メイン処理
