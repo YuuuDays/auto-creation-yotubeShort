@@ -2,6 +2,8 @@ import re
 
 from bs4 import BeautifulSoup
 
+from content_processing.fillter import filter_mask_text
+
 """
 スクレイピングした画像を含むテキストの不要部分を抽出
 @in ...↑の内容のstr
@@ -33,7 +35,9 @@ def extract_images_and_texts(html: str):
             if text:
                 # トリミング処理('>>数字'の部分の切り取り)
                 convert_text = re.sub(r'>>\d+[，,]?','>>',text)
-                tmp_list.append(convert_text)
+                # マスキング処理(fillter.pyの文言に対して伏字を行う)
+                convert_text_filtered= filter_mask_text(convert_text)
+                tmp_list.append(convert_text_filtered)
                 # print(convert_text)
 
     # 作成したリストをタプルinリストへ

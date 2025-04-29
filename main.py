@@ -41,8 +41,8 @@ def main():
     image_dict, text_dict = extract_images_and_texts(output_object[1])
     # for i in image_dict:
     #     print(image_dict[i])
-    # for j in text_dict:
-    #     print(j)
+    for j in text_dict:
+        print(j)
 
     #generate_audio(text_dict)
 

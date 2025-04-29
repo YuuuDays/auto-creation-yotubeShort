@@ -20,7 +20,7 @@ def combine_audio_with_silence(audio_folder, output_file, audio_format):
 
     files = sorted(os.listdir(audio_folder), key=natural_sort_key)
     for filename in files:
-        print(f"filename={filename}")
+        #print(f"filename={filename}")
         if filename.endswith(audio_format) and filename != os.path.basename(output_file):
             file_path = os.path.join(audio_folder, filename)
             audio = AudioSegment.from_mp3(file_path)
