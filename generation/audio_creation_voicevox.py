@@ -3,7 +3,6 @@ import time
 import requests
 import os
 from dotenv import load_dotenv
-from faster_whisper import WhisperModel
 
 
 # 1. VOICEVOXエンジンを起動する
@@ -60,3 +59,37 @@ def create_voice(text, speaker_id, output_path):
 
     # ピー音加工する
     #apply_beep_filter(output_path, text)
+
+
+
+# 音声クエリを取得するだけの関数（再利用用）
+def get_audio_query(text, speaker_id):
+    response = requests.post(
+        "http://127.0.0.1:50021/audio_query",
+        params={"text": text, "speaker": speaker_id}
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def estimate_word_timings(audio_query_json):
+    total_duration = 0.0
+    for accent_phrase in audio_query_json['accent_phrases']:
+        for mora in accent_phrase['moras']:
+            total_duration += mora['consonant_length'] if mora.get('consonant_length') else 0
+            total_duration += mora['vowel_length']
+
+    timings = []
+    current_time = 0.0
+    for accent_phrase in audio_query_json['accent_phrases']:
+        for mora in accent_phrase['moras']:
+            start_time = current_time
+            duration = 0
+            if mora.get('consonant_length'):
+                duration += mora['consonant_length']
+            duration += mora['vowel_length']
+            end_time = start_time + duration
+            timings.append((mora['text'], start_time, end_time))
+            current_time = end_time
+
+    return timings

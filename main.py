@@ -11,6 +11,8 @@ from content_processing.fillter import filter_mask_text
 from api.contact_openapi import convert_title_to_slang
 from content_processing.extract_text_and_image import extract_images_and_texts
 from generation.p_voice_filter import apply_beep_filter_from_text
+from generation.combine_audio_files import combine_audio_with_silence
+
 
 # グローバル定数
 audio_format = ".wav"
@@ -49,28 +51,26 @@ def main():
     image_dict, text_dict = extract_images_and_texts(output_object[1])
     # for i in image_dict:
     #     print(image_dict[i])
-    for j in text_dict:
-        print(j)
+    # for j in text_dict:
+    #     print(j)
 
     # """""""""""""""""""""""""""
     # VOICEの作成
     # """""""""""""""""""""""""""
-    # VICEVOXの初期化(起動)
     start_voicevox_engine()
     # voiceの作成
     generate_all_voices(text_dict)
 
-
     # =================================
     # ピー音加工
     # =================================
-    # VOICE生成後のループで適用（セリフごと）
-    for key, line in text_dict:
+    for key, original_text in text_dict:
+        masked_text = filter_mask_text(original_text)
         wav_path = f"output_audio/voice_{key}.wav"
-        apply_beep_filter_from_text(wav_path, line)
+        apply_beep_filter_from_text(wav_path, original_text, masked_text)
 
     # output_audioフォルダの中にある音声ファイルを一つの音声ファイルに結合
-    #timestamps = combine_audio_with_silence("output_audio", "output_audio/final_output.mp3",audio_format)
+    timestamps = combine_audio_with_silence("output_audio", "output_audio/final_output.mp3",audio_format)
 
 
 # メイン処理
