@@ -2,6 +2,8 @@
 # インポート文
 import os
 import threading
+
+from generation.generate_video_with_subtitles import generate_video_with_subtitles
 from utils.logger import get_logger
 
 # 自作モジュール
@@ -62,16 +64,27 @@ def main():
     generate_all_voices(text_dict)
 
     # =================================
-    # ピー音加工
+    # ピー音加工 & テキスト伏字処理
     # =================================
+    # 加工済みコメント
+    edited_comment = []
+
     for key, original_text in text_dict:
+        #　伏字処理
         masked_text = filter_mask_text(original_text)
+        edited_comment.append((key,masked_text))
+
+        # ピー音処理済みファイルの上書き
         wav_path = f"output_audio/voice_{key}.wav"
         apply_beep_filter_from_text(wav_path, original_text, masked_text)
+
 
     # output_audioフォルダの中にある音声ファイルを一つの音声ファイルに結合
     timestamps = combine_audio_with_silence("output_audio", "output_audio/final_output.mp3",audio_format)
 
+    # === 動画に字幕を焼き込む処理 ===
+    output_video_path = "output_movie/final_output_with_subs.mp4"
+    generate_video_with_subtitles(timestamps, edited_comment, "output_audio/final_output.mp3", output_video_path)
 
 # メイン処理
 if __name__ == "__main__":
