@@ -10,5 +10,7 @@ token.json
 .idea/
 /content_processing/fillter.py
 !content_processing/xtract_text_and_image.py
-.OUTPUT/
+.output_audio/
 .material/
+.output_movie/
+
