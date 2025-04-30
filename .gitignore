@@ -13,4 +13,5 @@ token.json
 .output_audio/
 .material/
 .output_movie/
+.assets/*
 
