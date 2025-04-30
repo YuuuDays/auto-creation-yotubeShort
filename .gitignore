@@ -14,4 +14,4 @@ token.json
 .material/
 .output_movie/
 .assets/*
-
+.temp/
