@@ -4,6 +4,7 @@ import os
 import threading
 
 from generation.generate_video_with_subtitles import generate_video_with_subtitles
+from generation.random_video_creator import concatenate_random_videos
 from utils.logger import get_logger
 
 # 自作モジュール
@@ -72,7 +73,7 @@ def main():
     for key, original_text in text_dict:
         #　伏字処理
         masked_text = filter_mask_text(original_text)
-        edited_comment.append((key,masked_text))
+        edited_comment.append((key,masked_text))    # [(コメントの添え字, 伏字加工済みのコメント),(...,...)]
 
         # ピー音処理済みファイルの上書き
         wav_path = f"output_audio/voice_{key}.wav"
@@ -82,9 +83,16 @@ def main():
     # output_audioフォルダの中にある音声ファイルを一つの音声ファイルに結合
     timestamps = combine_audio_with_silence("output_audio", "output_audio/final_output.mp3",audio_format)
 
+    """
+    タイムスタンプを元にランダム背景動画を作成
+    """
+    tmp_background_video_path = "temp/background_ready.mp4"
+    concatenate_random_videos(tmp_background_video_path, timestamps)
+
     # === 動画に字幕を焼き込む処理 ===
-    output_video_path = "output_movie/final_output_with_subs.mp4"
-    generate_video_with_subtitles(timestamps, edited_comment, "output_audio/final_output.mp3", output_video_path)
+    output_video_path = "output_movie/final_output_with_subs.mp4"   # path指定
+    generate_video_with_subtitles(timestamps, edited_comment, "output_audio/final_output.mp3", tmp_background_video_path, output_video_path )
+
 
 # メイン処理
 if __name__ == "__main__":

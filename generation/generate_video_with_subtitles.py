@@ -3,8 +3,11 @@ import os
 import subprocess
 from PIL import ImageFont
 
+"""
+概要:伏字加工されたテキストと、ランダムで結合された背景動画を使用し、映像を作成する
 
-def generate_video_with_subtitles(timestamps, text_dict, audio_path, output_path="final_output_with_subs.mp4"):
+"""
+def generate_video_with_subtitles(timestamps, text_dict, audio_path, tmp_background_video_path, output_path="final_output_with_subs.mp4"):
     # 出力先フォルダを確認し、既存の.mp4ファイルを削除
     output_dir = os.path.dirname(output_path)
     if not os.path.exists(output_dir):
@@ -41,8 +44,7 @@ def generate_video_with_subtitles(timestamps, text_dict, audio_path, output_path
 
     cmd = [
         "ffmpeg",
-        "-f", "lavfi",
-        "-i", f"color=c=black:s={width}x{height}:d={duration}",
+        "-i", "temp/background_ready.mp4",  # ✅ ここを修正
         "-i", audio_path,
         "-vf", full_filter,
         "-c:v", "libx264",
