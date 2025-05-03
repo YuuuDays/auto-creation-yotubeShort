@@ -2,6 +2,7 @@
 # インポート文
 import os
 import threading
+import subprocess
 
 from generation.generate_video_with_subtitles import generate_video_with_subtitles
 from generation.random_video_creator import concatenate_random_videos
@@ -15,6 +16,7 @@ from api.contact_openapi import convert_title_to_slang
 from content_processing.extract_text_and_image import extract_images_and_texts
 from generation.p_voice_filter import apply_beep_filter_from_text
 from generation.combine_audio_files import combine_audio_with_silence
+from generation.generate_ass_subtitle import create_ass_file
 
 
 # グローバル定数
@@ -89,10 +91,31 @@ def main():
     tmp_background_video_path = "temp/background_ready.mp4"
     concatenate_random_videos(tmp_background_video_path, timestamps)
 
-    # === 動画に字幕を焼き込む処理 ===
-    output_video_path = "output_movie/final_output_with_subs.mp4"   # path指定
-    generate_video_with_subtitles(timestamps, edited_comment, "output_audio/final_output.mp3", tmp_background_video_path, output_video_path )
+    # === ASS字幕ファイルを作成 ===
+    ass_path = "subtitle.ass"
+    create_ass_file(edited_comment, timestamps, ass_path, "メイリオ")
 
+    # === ffmpegでASS字幕を焼き込む ===
+    output_video_path = "output_movie/final_output_with_subs.mp4"
+    cmd = [
+    "ffmpeg",
+    "-i", tmp_background_video_path,
+    "-i", "output_audio/final_output.mp3",
+    "-vf", f"ass={ass_path}",
+    "-map", "0:v:0",
+    "-map", "1:a:0",
+    "-t", str(timestamps[-1][1]),
+    "-r", "30",
+    "-c:v", "libx264",
+    "-preset", "medium",
+    "-crf", "23",
+    "-c:a", "aac",
+    "-b:a", "192k",
+    "-y",
+    output_video_path
+    ]
+    subprocess.run(cmd, check=True)
+    print(f"✅ 動画生成完了: {output_video_path}")
 
 # メイン処理
 if __name__ == "__main__":

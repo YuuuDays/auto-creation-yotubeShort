@@ -3,7 +3,7 @@ import subprocess
 from PIL import ImageFont
 
 def escape_text_for_ffmpeg(text):
-    # 特殊文字のエスケープ & ffmpegが解釈できるようにする
+    # 必要最低限のエスケープだけ
     return text.replace('\\', '\\\\').replace(':', '\\:').replace("'", "\\'").replace('"', '\\"')
 
 
@@ -17,7 +17,12 @@ def generate_video_with_subtitles(timestamps, text_dict, audio_path, tmp_backgro
                 os.remove(os.path.join(output_dir, file))
 
     total_duration = timestamps[-1][1]
-    font_path = os.path.abspath("assets/fonts/irohamaru-Medium.ttf")
+    font_path = os.path.abspath("assets/fonts/irohamaru-Medium.ttf").replace("\\", "/")
+    print(f"[DEBUG] font_path: {font_path}")
+    if not os.path.exists(font_path):
+        print("[ERROR] フォントファイルが見つかりません！")
+    else:
+        print("[OK] フォントファイルは存在します。")
     font = ImageFont.truetype(font_path, size=40)
 
     # drawtext フィルタの生成
@@ -44,10 +49,20 @@ def generate_video_with_subtitles(timestamps, text_dict, audio_path, tmp_backgro
         "-t", str(total_duration),
         "-r", "30",
         "-c:v", "libx264",
+        "-preset", "medium",  # エンコード品質の設定
+        "-crf", "23",        # 品質設定（18-28の範囲、低いほど高品質）
         "-c:a", "aac",
         "-b:a", "192k",
+        "-y",  # 上書き許可
         output_path
     ]
 
-    subprocess.run(cmd, check=True)
-    print(f"✅ 動画生成完了: {output_path}")
+    print(f"[DEBUG] ffmpegコマンド: {' '.join(cmd)}")
+
+    try:
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError as e:
+        print("[ERROR] ffmpeg実行時にエラーが発生しました")
+        print(e)
+    else:
+        print(f"✅ 動画生成完了: {output_path}")
