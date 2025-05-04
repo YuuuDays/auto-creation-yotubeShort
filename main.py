@@ -91,6 +91,9 @@ def main():
     tmp_background_video_path = "temp/background_ready.mp4"
     concatenate_random_videos(tmp_background_video_path, timestamps)
 
+    """""""""""""""""""""
+    動画に字幕を焼き込む
+    """""""""""""""""""""
     # === ASS字幕ファイルを作成 ===
     ass_path = "subtitle.ass"
     create_ass_file(edited_comment, timestamps, ass_path, "メイリオ")
@@ -116,6 +119,8 @@ def main():
     ]
     subprocess.run(cmd, check=True)
     print(f"✅ 動画生成完了: {output_video_path}")
+
+    # ここでインド人を右へ
 
 # メイン処理
 if __name__ == "__main__":
