@@ -121,7 +121,7 @@ def main():
     print(f"✅ 動画生成完了: {output_video_path}")
 
     # ここでインド人を右へ
-
+    # ここで左へ
 # メイン処理
 if __name__ == "__main__":
     main()
