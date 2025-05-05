@@ -60,9 +60,11 @@ def concatenate_random_videos(output_path, timestamps, video_dir="assets/video_s
 
     # 連結
     subprocess.run([
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", "temp_concat.txt",
-        "-c", "copy", output_path
-    ], check=True)
+    "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", "temp_concat.txt",
+    "-c:v", "libx264", "-preset", "ultrafast",
+    "-c:a", "aac", "-b:a", "128k",
+    output_path
+], check=True)
 
     # クリーンアップ
     for clip in temp_clips:
