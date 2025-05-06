@@ -1,4 +1,5 @@
 import random
+from generation.audio_creation_voicevox import get_audio_query, estimate_word_timings
 
 def sec_to_ass_time(sec):
     h = int(sec // 3600)
@@ -21,16 +22,11 @@ def random_color():
     b = random.randint(0, 255)
     return f"&H00{b:02X}{g:02X}{r:02X}"
 
-def create_ass_file(subs, timestamps, ass_path, font="メイリオ"):
-    num_styles = len(subs)
-    style_names = []
-    style_defs = ""
-    for i in range(num_styles):
-        style_name = f"Style{i}"
-        color = random_color()
-        style_defs += f"Style: {style_name},{font},90,{color},&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,3,0,5,30,30,30,1\n"
-        style_names.append(style_name)
+def colorize_text(text, color="&H00FF00&"):
+    # 例：全体を色付きにしたい場合
+    return r"{\c" + color + "}" + text + r"{\c&HFFFFFF&}"  # 最後で白に戻す
 
+def create_ass_file(subs, timestamps, ass_path, font="メイリオ"):
     with open(ass_path, "w", encoding="utf-8") as f:
         f.write(f"""[Script Info]
 ScriptType: v4.00+
@@ -39,12 +35,25 @@ PlayResY: 1920
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-{style_defs}
+""")
+        # 各コメントごとにランダム色のStyleを作成
+        for idx, (key, text) in enumerate(subs):
+            color = random_color()
+            f.write(f"Style: Karaoke{idx},{font},90,&H00FFFFFF,{color},&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,3,0,5,30,30,30,1\n")
+
+        f.write("""
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """)
         for idx, (key, text) in enumerate(subs):
             start, end = timestamps[key]
-            text = auto_linebreak(text, max_len=10)
-            style = style_names[idx]
-            f.write(f"Dialogue: 0,{sec_to_ass_time(start)},{sec_to_ass_time(end)},{style},,0,0,0,,{text}\n")
+            # VOICEVOXのタイミング取得
+            query_json = get_audio_query(text, 8)  # speaker_idは適宜
+            timings = estimate_word_timings(query_json)
+            # カラオケタグ生成
+            karaoke_line = ""
+            for i, (char, t) in enumerate(zip(text, timings)):
+                duration_cs = int((t[2] - t[1]) * 100)  # 1/100秒単位
+                karaoke_line += f"{{\\k{duration_cs}}}{char}"
+            # Dialogue出力（Styleをコメントごとに割り当て）
+            f.write(f"Dialogue: 0,{sec_to_ass_time(start)},{sec_to_ass_time(end)},Karaoke{idx},,0,0,0,,{karaoke_line}\n")
