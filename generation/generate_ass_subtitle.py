@@ -7,7 +7,7 @@ def sec_to_ass_time(sec):
     s = sec % 60
     return f"{h:d}:{m:02d}:{s:05.2f}"
 
-def auto_linebreak(text, max_len=10):
+def auto_linebreak(text, max_len=8):
     lines = []
     while len(text) > max_len:
         lines.append(text[:max_len])
@@ -39,7 +39,8 @@ Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour,
         # 各コメントごとにランダム色のStyleを作成
         for idx, (key, text) in enumerate(subs):
             color = random_color()
-            f.write(f"Style: Karaoke{idx},{font},90,&H00FFFFFF,{color},&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,3,0,5,30,30,30,1\n")
+            # 余白を広めに（例：左右120px）
+            f.write(f"Style: Karaoke{idx},{font},90,&H00FFFFFF,{color},&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,3,0,5,120,120,30,1\n")
 
         f.write("""
 [Events]
@@ -55,5 +56,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             for i, (char, t) in enumerate(zip(text, timings)):
                 duration_cs = int((t[2] - t[1]) * 100)  # 1/100秒単位
                 karaoke_line += f"{{\\k{duration_cs}}}{char}"
+            # 7～8文字ごとに改行
+            karaoke_line = auto_linebreak(karaoke_line, max_len=8)
             # Dialogue出力（Styleをコメントごとに割り当て）
             f.write(f"Dialogue: 0,{sec_to_ass_time(start)},{sec_to_ass_time(end)},Karaoke{idx},,0,0,0,,{karaoke_line}\n")
