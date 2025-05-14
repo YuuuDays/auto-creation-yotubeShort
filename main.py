@@ -122,7 +122,7 @@ def main():
 
     # ここでインド人を右へ
     # ここで左へ
-    # test
+    # test2
 # メイン処理
 if __name__ == "__main__":
     main()
