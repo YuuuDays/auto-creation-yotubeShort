@@ -120,10 +120,9 @@ def main():
     subprocess.run(cmd, check=True)
     print(f"✅ 動画生成完了: {output_video_path}")
 
-    # いったんリセット
-    #ココで画像を入れる処理
-
-    #test
+    # ここでインド人を右へ
+    # ここで左へ
+    # test2
 # メイン処理
 if __name__ == "__main__":
     main()
