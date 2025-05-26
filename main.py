@@ -120,7 +120,6 @@ def main():
     subprocess.run(cmd, check=True)
     print(f"✅ 動画生成完了: {output_video_path}")
 
-    # ここでインド人を右へ
     # ここで左へ
     # test224
 # メイン処理
